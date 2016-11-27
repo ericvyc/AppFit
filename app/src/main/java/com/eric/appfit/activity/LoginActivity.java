@@ -1,23 +1,21 @@
-package com.eric.appfit;
+package com.eric.appfit.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
-
 import android.content.CursorLoader;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,6 +27,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.eric.appfit.R;
+import com.eric.appfit.dao.UsuarioDao;
+import com.eric.appfit.model.Usuario;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +48,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+
+    private UsuarioDao usuarioDao;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -66,6 +73,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        usuarioDao = new UsuarioDao(getApplicationContext());
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -323,7 +333,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            // TODO: register the new account here.
+            Usuario usuario = new Usuario(mEmail, mPassword);
+            usuarioDao.insert(usuario);
+
+            QueryBuilder<Usuario, Integer> queryBuilder = usuarioDao.queryBuilder();
+            try {
+                queryBuilder.where().eq("EMAIL", mEmail);
+                PreparedQuery<Usuario> preparedQuery = queryBuilder.prepare();
+                List<Usuario> usuarios = usuarioDao.query(preparedQuery);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
             return true;
         }
 
