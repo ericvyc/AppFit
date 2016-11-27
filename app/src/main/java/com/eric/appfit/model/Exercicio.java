@@ -16,6 +16,12 @@ public class Exercicio {
     @DatabaseField(columnName = "NOME")
     private String nome;
 
+    @DatabaseField(columnName = "DESCRICAO")
+    private String descricao;
+
+    @DatabaseField(columnName = "ID_TIPO_EXERCICIO", foreign = true, foreignAutoRefresh = true, foreignColumnName = "ID")
+    private TipoExercicio tipoExercicio;
+
     public Long getId() {
         return id;
     }
@@ -32,12 +38,36 @@ public class Exercicio {
         this.nome = nome;
     }
 
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public TipoExercicio getTipoExercicio() {
+        return tipoExercicio;
+    }
+
+    public void setTipoExercicio(TipoExercicio tipoExercicio) {
+        this.tipoExercicio = tipoExercicio;
+    }
+
+    public Exercicio(String nome, String descricao, TipoExercicio tipoExercicio) {
+        this.nome = nome;
+        this.descricao = descricao;
+        this.tipoExercicio = tipoExercicio;
+    }
+
     public Exercicio() {
         super();
     }
 
-    public Exercicio(Long id, String nome) {
+    public Exercicio(Long id, String nome, String descricao, TipoExercicio tipoExercicio) {
         this.id = id;
         this.nome = nome;
+        this.descricao = descricao;
+        this.tipoExercicio = tipoExercicio;
     }
 }

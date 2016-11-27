@@ -10,7 +10,7 @@ import com.j256.ormlite.table.DatabaseTable;
 @DatabaseTable(tableName = "USUARIO")
 public class Usuario {
 
-    @DatabaseField(columnName = "ID")
+    @DatabaseField(columnName = "ID", generatedId = true)
     private Long id;
 
     @DatabaseField(columnName = "NOME")
@@ -18,6 +18,25 @@ public class Usuario {
 
     @DatabaseField(columnName = "EMAIL")
     private String email;
+
+    @DatabaseField(columnName = "SENHA")
+    private String senha;
+
+    public Usuario(String nome, String email, String senha) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+    }
+
+    public Usuario(Long id, String nome, String email, String senha) {
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+    }
+
+    public Usuario() {
+    }
 
     public Long getId() {
         return id;
@@ -43,18 +62,11 @@ public class Usuario {
         this.email = email;
     }
 
-    public Usuario(String nome, String email) {
-        this.nome = nome;
-        this.email = email;
+    public String getSenha() {
+        return senha;
     }
 
-    public Usuario(){
-        super();
-    }
-
-    public Usuario(Long id, String nome, String email) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }

@@ -28,8 +28,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.eric.appfit.R;
-import com.eric.appfit.dao.UsuarioDao;
+import com.eric.appfit.base.DataBaseHelper;
 import com.eric.appfit.model.Usuario;
+import com.j256.ormlite.android.apptools.OpenHelperManager;
+import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.stmt.PreparedQuery;
 import com.j256.ormlite.stmt.QueryBuilder;
 
@@ -48,8 +50,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
-
-    private UsuarioDao usuarioDao;
 
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -73,8 +73,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        usuarioDao = new UsuarioDao(getApplicationContext());
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -308,6 +306,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
+        private DataBaseHelper dataBaseHelper;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
@@ -333,19 +332,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }
 
-            Usuario usuario = new Usuario(mEmail, mPassword);
-            usuarioDao.insert(usuario);
-
-            QueryBuilder<Usuario, Integer> queryBuilder = usuarioDao.queryBuilder();
             try {
+
+                Usuario usuario = new Usuario("Teste", mEmail, mPassword);
+
+                final Dao<Usuario, Long> usuarioDao = getHelper().getUsuarioDao();
+                usuarioDao.create(usuario);
+
+                QueryBuilder<Usuario, Long> queryBuilder = usuarioDao.queryBuilder();
                 queryBuilder.where().eq("EMAIL", mEmail);
+
                 PreparedQuery<Usuario> preparedQuery = queryBuilder.prepare();
                 List<Usuario> usuarios = usuarioDao.query(preparedQuery);
+
             } catch (SQLException e) {
                 e.printStackTrace();
             }
 
             return true;
+        }
+
+        private DataBaseHelper getHelper() {
+            if (dataBaseHelper == null) {
+                dataBaseHelper = OpenHelperManager.getHelper(getApplicationContext(), DataBaseHelper.class);
+            }
+            return dataBaseHelper;
         }
 
         @Override
